@@ -80,6 +80,7 @@ REST_FRAMEWORK = {
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    
     # corsheaders
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -89,9 +90,11 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-CORS_ALLOWWED_ORIGINS = [
-    'http://localhost:8080/',
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:8080',
 ]
+
+
 
 ROOT_URLCONF = 'inside_out.urls'
 
