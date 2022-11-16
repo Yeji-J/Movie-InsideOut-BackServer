@@ -9,7 +9,7 @@ from .models import Actor, Genre, Movie, Review
 #         read_only_fields = ['like_users', 'actors']
 
 
-class MovieListSerializer(serializers.Modelserializer):
+class MovieListSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Movie
@@ -17,7 +17,7 @@ class MovieListSerializer(serializers.Modelserializer):
         read_only_fields = ('like_users', 'genres','actors')
 
 
-class MovieDetailSerializer(serializers.Modelserializer):
+class MovieDetailSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Movie
@@ -25,20 +25,20 @@ class MovieDetailSerializer(serializers.Modelserializer):
         read_only_fields = ('like_users', 'genres','actors')
 
 
-class MoviePopularListSerializer(serializers.Modelserializer):
+class MoviePopularListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Movie
         fields = ('title', 'genres','vote_average', 'poster_path', 'backdrop_path')
 
-class UpcomingListSerializer(serializers.Modelserializer):
+class UpcomingListSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Movie
         fields = ('title', 'genres','vote_average', 'poster_path', 'backdrop_path')
 
 
-class RecentListSerializer(serializers.Modelserializer):
+class RecentListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Movie
