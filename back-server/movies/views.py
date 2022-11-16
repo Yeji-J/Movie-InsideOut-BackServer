@@ -71,16 +71,24 @@ def movie_list(request):
 # Create your views here.
 @api_view(['POST', 'GET'])
 def movie_detail(request, movie_id):
-    if request.method == 'POST':
-        serializer = MovieDetailSerializer(data=request.data)
-        if serializer.is_valid():
-            movie = serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+    # if request.method == 'POST':
+    #     serializer = MovieDetailSerializer(data=request.data)
+    #     if serializer.is_valid():
+    #         movie = serializer.save()
+    #         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-    else:
-        movie = Movie.objects.get(movie_id=movie_id)
-        serializer = MovieDetailSerializer(movie)
-        return Response(serializer.data)
+    # else:
+    movie = Movie.objects.get(movie_id=movie_id)
+    serializer = MovieDetailSerializer(movie)
+
+    genre_lst = []
+    for genre_id in serializer.data['genres']:
+        genre = Genre.objects.get(pk=genre_id)
+        genre_lst.append(genre)
+
+    serializer.data['genres'] = genre_lst
+
+    return Response(serializer.data)
 
 
 
