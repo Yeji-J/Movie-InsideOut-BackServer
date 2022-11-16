@@ -28,7 +28,7 @@ class Movie(models.Model):
     vote_count = models.IntegerField()
     backdrop_path = models.TextField(null=True)
     runtime = models.IntegerField(null=True)
-    imdb_id = models.CharField(max_length=9, null=True)
+    movie_id = models.IntegerField(null=True)
 
     # ManyToManyField
     like_users = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name="like_movies")
