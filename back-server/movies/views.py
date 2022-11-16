@@ -4,8 +4,61 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 
-from .serializers import MovieDetailSerializer, MovieListSerializer, MoviePopularListSerializer, RecentListSerializer
-from .models import Movie
+from .serializers import MovieDetailSerializer, MovieListSerializer, MoviePopularListSerializer, RecentListSerializer, GenreSerializer
+from .models import Movie, Genre
+
+import requests
+
+
+@api_view(['GET'])
+def movie_create(request):
+    api_key = '3cd8e0319cee80069c4b85f6cf42fded'
+
+    url = 'https://api.themoviedb.org/3/genre/movie/list'
+    
+    params = {
+        'api_key': api_key,
+        'language': 'KO',
+    }
+
+    response = requests.get(url, params).json()
+
+    
+    for data in response['genres']:
+        genre = Genre(gerne_id = data['id'], name=data['name'])
+        genre.save()
+
+
+    page_num = [i for i in range(1, 6)]
+
+    for num in range(5):
+        
+        url = 'https://api.themoviedb.org/3/movie/popular'
+        
+        params = {
+            'api_key': api_key,
+            'language': 'ko',
+            'page': page_num[num],
+            'region': 'KR'
+        }
+
+        response = requests.get(url, params).json()["results"]
+
+        for data in response:
+            data['movie_id'] = data['id']   # movie_id를 pk로 했기 때문에 중복되지 않음
+            serializer = MovieDetailSerializer(data=data)
+            if serializer.is_valid():                       
+                
+                # raise_exception=True 중복되면, 에러 발생...
+                # 제거함.
+
+                serializer.save(genres = data['genre_ids'])
+            
+            else:
+                continue
+    
+    return Response(data, status=status.HTTP_200_OK)
+
 
 
 @api_view(['GET'])

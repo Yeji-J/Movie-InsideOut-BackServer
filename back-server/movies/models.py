@@ -3,6 +3,7 @@ from django.conf import settings
 
 # 장르 모델
 class Genre(models.Model):
+    gerne_id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=20)
 
     def __str__(self):
@@ -28,7 +29,7 @@ class Movie(models.Model):
     vote_count = models.IntegerField()
     backdrop_path = models.TextField(null=True)
     runtime = models.IntegerField(null=True)
-    movie_id = models.IntegerField(null=True)
+    movie_id = models.IntegerField(primary_key=True)
 
     # ManyToManyField
     like_users = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name="like_movies")
