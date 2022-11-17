@@ -3,6 +3,7 @@ from django.conf import settings
 
 # 장르 모델
 class Genre(models.Model):
+    gerne_id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=20)
 
     def __str__(self):
@@ -20,13 +21,15 @@ class Actor(models.Model):
 # Movie 모델
 class Movie(models.Model):
     title = models.CharField(max_length=100)
-    overview = models.TextField()
-    poster_path = models.TextField()
+    overview = models.TextField(null=True)
+    poster_path = models.TextField(null=True)
     release_date = models.DateField()
     adult = models.BooleanField()
     vote_average = models.FloatField()
     vote_count = models.IntegerField()
-    backdrop_path = models.TextField()
+    backdrop_path = models.TextField(null=True)
+    runtime = models.IntegerField(null=True)
+    movie_id = models.IntegerField(primary_key=True)
 
     # ManyToManyField
     like_users = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name="like_movies")
