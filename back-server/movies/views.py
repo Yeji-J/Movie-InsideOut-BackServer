@@ -12,13 +12,15 @@ import requests
 
 @api_view(['GET'])
 def movie_create(request):
+
+    # 장르 API -> 데이터 불러오기
     api_key = '3cd8e0319cee80069c4b85f6cf42fded'
 
     url = 'https://api.themoviedb.org/3/genre/movie/list'
     
     params = {
         'api_key': api_key,
-        'language': 'KO',
+        # 'language': 'KO',
     }
 
     response = requests.get(url, params).json()
@@ -29,6 +31,7 @@ def movie_create(request):
         genre.save()
 
 
+    # Movie API -> 데이터 불러오기
     page_num = [i for i in range(1, 6)]
 
     for num in range(5):
@@ -37,7 +40,7 @@ def movie_create(request):
         
         params = {
             'api_key': api_key,
-            'language': 'ko',
+            # 'language': 'ko',
             'page': page_num[num],
             'region': 'KR'
         }
@@ -49,8 +52,7 @@ def movie_create(request):
             serializer = MovieDetailSerializer(data=data)
             if serializer.is_valid():                       
                 
-                # raise_exception=True 중복되면, 에러 발생...
-                # 제거함.
+                # raise_exception=True 중복되면, 에러 발생... 제거함.
 
                 serializer.save(genres = data['genre_ids'])
             
