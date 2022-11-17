@@ -7,4 +7,6 @@ urlpatterns = [
 
     path('create/', views.movie_create),
     path('<int:movie_id>/', views.movie_detail),
+
+    path('<int:movie_id>/like', views.like)
 ]

@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.http import JsonResponse
 
 from rest_framework import status
 from rest_framework.response import Response
@@ -118,4 +119,20 @@ def movie_detail(request, movie_id):
     serializer.data['genres'] = genre_lst
 
     return Response(serializer.data)
+
+
+def like(request, movie_id):
+    # if request.user.is_authenticated():
+    movie = Movie.objects.get(movie_id=movie_id)
+    if movie.like_users.filter(pk=movie_id).exists():
+        movie.like_users.remove(request.user)
+        is_liked = False
+    else:
+        movie.like_users.add(request.user)
+        is_liked = True
+    context = {
+        'is_liked': is_liked,
+        'like_count' : movie.like_users.count()
+    }
+    return JsonResponse(context)
 
