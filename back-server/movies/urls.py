@@ -11,5 +11,5 @@ urlpatterns = [
     path('recent/', views.movie_recent),
     # path('movies')
 
-    path('<str:movie_id>/', views.movie_detail),
+    path('<int:movie_id>/', views.movie_detail),
 ]
