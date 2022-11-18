@@ -50,6 +50,11 @@ def movie_create(request):
         response = requests.get(url, params).json()["results"]
 
         for data in response:
+            # if Movie.objects.filter(movie_id=data['id']):
+            #     print(">>>>>>>>>>>>>>>>> failure")
+            # else:
+            #     print(data['title'])
+            #     print(">>>>>>>>>>>>>>>>> seccess")
             data['movie_id'] = data['id']   # movie_id를 pk로 했기 때문에 중복되지 않음
             serializer = MovieDetailSerializer(data=data)
             if serializer.is_valid():                                       
@@ -58,6 +63,7 @@ def movie_create(request):
             
             else:
                 continue
+
 
     # Recent      
     url = 'https://api.themoviedb.org/3/movie/now_playing'
@@ -79,7 +85,9 @@ def movie_create(request):
         
         else:
             continue
-    
+
+    # print('>>>>>>>>>>>>>>>>>>>>>', Movie.objects.distinct().values('title').count())
+
     return Response(data, status=status.HTTP_200_OK)
 
 
