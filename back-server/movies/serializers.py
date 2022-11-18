@@ -14,7 +14,7 @@ class MovieListSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Movie
-        fields = ('title', 'genres', 'release_date', 'vote_average', 'poster_path', 'backdrop_path', 'movie_id')
+        fields = '__all__'
         read_only_fields = ('like_users', 'actors')
 
 
