@@ -169,12 +169,20 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'accounts.User'
+
+
+# fixture data encoding Error 문제 해결 방안
+import _locale
+_locale._getdefaultlocale = (lambda *args: ['en_US', 'utf-8'])
 
 
 # TOKEN = 4bfe0a410f95b5256c05cb9375de1e79f96099b1

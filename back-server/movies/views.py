@@ -50,11 +50,6 @@ def movie_create(request):
         response = requests.get(url, params).json()["results"]
 
         for data in response:
-            # if Movie.objects.filter(movie_id=data['id']):
-            #     print(">>>>>>>>>>>>>>>>> failure")
-            # else:
-            #     print(data['title'])
-            #     print(">>>>>>>>>>>>>>>>> seccess")
             data['movie_id'] = data['id']   # movie_id를 pk로 했기 때문에 중복되지 않음
             serializer = MovieDetailSerializer(data=data)
             if serializer.is_valid():                                       
