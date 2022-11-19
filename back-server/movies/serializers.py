@@ -37,8 +37,8 @@ class ReviewSerializer(serializers.ModelSerializer):
 class MovieDetailSerializer(serializers.ModelSerializer):
     genres = GenreNameSerializer(many=True, read_only=True)
     actors = ActorSerializer(many=True, read_only=True)
-    review_set = ReviewSerializer(many=True, read_only=True)
-    review_count = serializers.IntegerField(source='review_set.count', read_only=True)
+    reviews = ReviewSerializer(many=True, read_only=True)
+    review_count = serializers.IntegerField(source='reviews.count', read_only=True)
     
     class Meta:
         model = Movie
