@@ -186,4 +186,5 @@ import _locale
 _locale._getdefaultlocale = (lambda *args: ['en_US', 'utf-8'])
 
 
-# TOKEN = 4bfe0a410f95b5256c05cb9375de1e79f96099b1
+# admin - test123!
+# TOKEN = 2354b9ffe0cc384a51d7f4d2a5598f30b92a9a75
