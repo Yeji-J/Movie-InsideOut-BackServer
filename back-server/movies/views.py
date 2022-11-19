@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 
 from .serializers import MovieDetailSerializer, MovieListSerializer, ReviewSerializer
-from .models import Movie, Genre, Review
+from .models import Movie, Genre, Actor, Review
 
 import requests
 
@@ -34,53 +34,63 @@ def movie_create(request):
 
 
     # Movie API -> 데이터 불러오기
+    # 인기영화('popular), 상영중(upcoming)인 영화 한번에 받기
+    url_name = [['popular', 5], ['now_playing', 1]]
     page_num = [i for i in range(1, 6)]
 
-    for num in range(5):
-        
-        url = 'https://api.themoviedb.org/3/movie/popular'
-        
-        params = {
-            'api_key': api_key,
-            # 'language': 'ko',
-            'page': page_num[num],
-            'region': 'KR'
-        }
 
-        response = requests.get(url, params).json()["results"]
-
-        for data in response:
-            data['movie_id'] = data['id']   # movie_id를 pk로 했기 때문에 중복되지 않음
-            serializer = MovieDetailSerializer(data=data)
-            if serializer.is_valid():                                       
-                # raise_exception=True 중복되면, 에러 발생... 제거함.
-                serializer.save(genres = data['genre_ids'])
+    for name, max_num in url_name:
+        
+        for num in range(max_num):
             
-            else:
-                continue
+            url = 'https://api.themoviedb.org/3/movie/' + name
+            params = {
+                'api_key': api_key,
+                # 'language': 'KO',
+                'page': page_num[num],
+                'region': 'KR'
+            }
 
+            response = requests.get(url, params).json()['results']
 
-    # Recent      
-    url = 'https://api.themoviedb.org/3/movie/now_playing'
+            for data in response:
+                movie_id = data['id']
+                actor_url = f'https://api.themoviedb.org/3/movie/{movie_id}/credits'
+                
+                params = {
+                    'api_key': api_key,
+                    # 'language': 'KO',
+                }
+
+                # 출연진 : cast, 연출진: crew
+                res = requests.get(actor_url, params).json()['cast']
+
+                actors = []
+                if len(res):
+                    if len(res) < 5:
+                        for idx in range(len(res)):
+                            actor = Actor(actor_id = res[idx]['id'], name = res[idx]['name'])
+                            actor.save()
+
+                            actors.append(res[idx]['id'])
+                    
+                    else:
+                        for idx in range(5):
+                            actor = Actor(actor_id = res[idx]['id'], name = res[idx]['name'])
+                            actor.save()
+
+                            actors.append(res[idx]['id'])
+                    
+                    
+                    data['movie_id'] = data['id']
+                    serializer = MovieDetailSerializer(data = data)
+                    
+                    if serializer.is_valid():
+                        serializer.save(genres=data['genre_ids'], actors=actors)
+
+                    else:
+                        continue
     
-    params = {
-        'api_key': api_key,
-        # 'language': 'ko',
-        'page': 1,
-        'region': 'KR'
-    }
-
-    response = requests.get(url, params).json()["results"]
-
-    for data in response:
-        data['movie_id'] = data['id']
-        serializer = MovieDetailSerializer(data=data)
-        if serializer.is_valid():                                       
-            serializer.save(genres = data['genre_ids'])
-        
-        else:
-            continue
-
     # print('>>>>>>>>>>>>>>>>>>>>>', Movie.objects.distinct().values('title').count())
 
     return Response(data, status=status.HTTP_200_OK)

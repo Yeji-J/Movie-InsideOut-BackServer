@@ -12,6 +12,7 @@ class Genre(models.Model):
 
 # 배우 모델
 class Actor(models.Model):
+    actor_id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=20)
 
     def __str__(self):
