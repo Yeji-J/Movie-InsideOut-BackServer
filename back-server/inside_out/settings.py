@@ -63,21 +63,47 @@ INSTALLED_APPS = [
 
 SITE_ID = 1
 
+
 REST_FRAMEWORK = {
-    # Authentication
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.TokenAuthentication',
-    ],
 
     # permission 
-    'DEFAULT_PERMISSION_CLASSES': [
-        # 'rest_framework.permissions.IsAuthenticated',     # 선택적으로 권한 허용
+    'DEFAULT_PERMISSION_CLASSES': (
+        # 'rest_framework.permissions.IsAuthenticated',   # 인증된 사용자만 접근 가능
         'rest_framework.permissions.AllowAny',          # 모든 요청에 대한 권한 허용
-    ],
+    ),
+    
+    # Authentication
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+    ),
 
     # spectacular Settings
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
+
+
+import datetime
+
+JWT_AUTH = {
+    # 'JWT_SECRET_KEY': SECRET_KEY,   # ???
+    # 'JWT_ALGORITHM': 'HS256',     # JWT 암호화에 사용되는 알고리즘 설정
+    # 'JWT_ALLOW_REFRESH': True,      # JWT 토큰을 refresh 할 건지?
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(days=1),  # JWT 토큰의 유효기간(지속시간: 기본값 5분) 설정 
+    # 'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(days=28),  # JWT 토큰의 갱신 유효기간 설정
+}
+
+# 로그인 전에 JWT 사용하고 싶을 때
+# REST_USE_JWT = True
+
+# 로그인할 때, email이 필요하지 않을 때
+ACCOUNT_EMAIL_REQUIRED = False
+ACCOUNT_EMAIL_VERIFICATION = None
+
+# 로그아웃 설정?
+ACCOUNT_LOGOUT_ON_GET = True
 
 
 MIDDLEWARE = [
@@ -186,5 +212,6 @@ import _locale
 _locale._getdefaultlocale = (lambda *args: ['en_US', 'utf-8'])
 
 
-# admin - test123!
-# TOKEN = 2354b9ffe0cc384a51d7f4d2a5598f30b92a9a75
+
+# TOKEN = d38ed6c5930db33554356628936c5c49b8caa471
+
