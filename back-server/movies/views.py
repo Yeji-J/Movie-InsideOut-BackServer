@@ -127,6 +127,7 @@ def movie_detail(request, movie_id):
     return Response(serializer.data)
 
 
+@api_view(['GET'])
 def like(request, movie_id):
     movie = get_object_or_404(Movie, pk=movie_id)
 
@@ -160,7 +161,7 @@ def review_create(request, movie_id):
     movie = get_object_or_404(Movie, pk=movie_id)
     serializer = ReviewSerializer(data=request.data)
     if serializer.is_valid(raise_exception=True):
-        serializer.save(movie=movie)
+        serializer.save(movie=movie, user=request.user)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 

@@ -24,4 +24,5 @@ urlpatterns = [
     path('accounts/', include('dj_rest_auth.urls')),
     path('accounts/signup/', include('dj_rest_auth.registration.urls')),
     path('accounts/api-token-auth/', obtain_jwt_token),   # JWT token 발행.
+    path('profile/', include('accounts.urls')),
 ]
