@@ -38,5 +38,25 @@ def profile(request, username):
 
 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def follow(request, user_pk):
-    pass
+    User = get_user_model()
+    person = get_object_or_404(User, pk=user_pk)
+    if person != request.user:
+        if person.follower.filter(pk=request.user.pk).exists():
+            person.follower.remove(request.user)
+            is_followed = False
+
+        else:
+            person.follower.add(request.user)
+            is_followed = True
+        
+        context = {
+            'is_followed': is_followed,
+            'follow_count': person.follower.count(),
+            'following_count': person.following.count()
+        }
+        
+        return JsonResponse(context)
+    
+    # return Response()

@@ -7,7 +7,7 @@ class Post(models.Model):
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    view_count = models.IntegerField()
+    view_count = models.IntegerField(default=0)
 
     # ForeignKey
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="like_reviews")
@@ -25,5 +25,6 @@ class Comment(models.Model):
     # ForeignKey
     post = models.ForeignKey(Review, on_delete=models.CASCADE)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    
     # 대댓글
     origin_comment = models.ForeignKey('self', on_delete=models.CASCADE, null=True)
