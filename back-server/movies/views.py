@@ -124,14 +124,24 @@ def movie_detail(request, movie_id):
     movie = get_object_or_404(Movie, pk=movie_id)
     serializer = MovieDetailSerializer(movie)
 
-    return Response(serializer.data)
+    if movie.like_users.filter(pk=request.user.pk).exists():
+        is_liked = False
+    else:
+        is_liked = True
+
+    context = {
+        'data': serializer.data,
+        'is_liked': is_liked
+    }
+
+    return Response(context)
 
 
 @api_view(['GET'])
 def like(request, movie_id):
     movie = get_object_or_404(Movie, pk=movie_id)
 
-    if movie.like_users.filter(pk=movie_id).exists():
+    if movie.like_users.filter(pk=request.user.pk).exists():
         movie.like_users.remove(request.user)
         is_liked = False
     
