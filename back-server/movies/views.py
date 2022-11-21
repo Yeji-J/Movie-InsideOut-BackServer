@@ -125,9 +125,9 @@ def movie_detail(request, movie_id):
     serializer = MovieDetailSerializer(movie)
 
     if movie.like_users.filter(pk=request.user.pk).exists():
-        is_liked = False
-    else:
         is_liked = True
+    else:
+        is_liked = False
 
     context = {
         'data': serializer.data,
