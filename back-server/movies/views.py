@@ -121,15 +121,17 @@ def movie_list(request):
 
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
 def movie_detail(request, movie_id):
     movie = get_object_or_404(Movie, pk=movie_id)
     serializer = MovieDetailSerializer(movie)
+    
+    is_liked = False
 
-    if movie.like_users.filter(pk=request.user.pk).exists():
-        is_liked = True
-    else:
-        is_liked = False
+    if request.user.pk:
+        if movie.like_users.filter(pk=request.user.pk).exists():
+            is_liked = True
+        else:
+            is_liked = False
 
     context = {
         'data': serializer.data,
@@ -143,7 +145,7 @@ def movie_detail(request, movie_id):
 @permission_classes([IsAuthenticated])
 def like(request, movie_id):
     movie = get_object_or_404(Movie, pk=movie_id)
-
+    
     if movie.like_users.filter(pk=request.user.pk).exists():
         movie.like_users.remove(request.user)
         is_liked = False
@@ -151,25 +153,32 @@ def like(request, movie_id):
     else:
         movie.like_users.add(request.user)
         is_liked = True
-    
+        
     context = {
         'is_liked': is_liked,
         'like_count' : movie.like_users.count()
     }
+
     return JsonResponse(context)
 
 
 # 댓글을 모두 출력?
-# @api_view(['GET'])
-# def review_list(request):
-#     if request.method == 'GET':
-#         reviews = get_list_or_404(Review)
-#         serializer = ReviewSerializer(reviews, many=True)
-#         return Response(serializer.data)
+@api_view(['GET'])
+def review_list(request):
+    if request.method == 'GET':
+        reviews = get_list_or_404(Review)
+        serializer = ReviewSerializer(reviews, many=True)
+        return Response(serializer.data)
+
+
+@api_view(['GET'])
+def review_list(request, movie_id):
+    movie = get_object_or_404(Movie, pk=movie_id)
+    return Response(movie.reviews.all().values())
 
 
 # 댓글 생성 -> 저장하기
-@api_view(['POST'])
+@api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
 def review_create(request, movie_id):
     movie = get_object_or_404(Movie, pk=movie_id)
@@ -180,6 +189,7 @@ def review_create(request, movie_id):
 
 
 @api_view(['GET', 'PUT', 'DELETE'])
+@permission_classes([IsAuthenticated])
 def review_detail(request, review_pk):
     review = get_object_or_404(Review, pk=review_pk)
 
