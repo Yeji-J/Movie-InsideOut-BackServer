@@ -4,7 +4,8 @@ from django.shortcuts import get_object_or_404, get_list_or_404
 
 from rest_framework import status
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 
 from .serializers import MovieDetailSerializer, MovieListSerializer, ReviewSerializer
 from .models import Movie, Genre, Actor, Review
@@ -120,6 +121,7 @@ def movie_list(request):
 
 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def movie_detail(request, movie_id):
     movie = get_object_or_404(Movie, pk=movie_id)
     serializer = MovieDetailSerializer(movie)
@@ -138,6 +140,7 @@ def movie_detail(request, movie_id):
 
 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def like(request, movie_id):
     movie = get_object_or_404(Movie, pk=movie_id)
 
@@ -167,6 +170,7 @@ def like(request, movie_id):
 
 # 댓글 생성 -> 저장하기
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def review_create(request, movie_id):
     movie = get_object_or_404(Movie, pk=movie_id)
     serializer = ReviewSerializer(data=request.data)

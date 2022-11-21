@@ -31,6 +31,7 @@ class Movie(models.Model):
     backdrop_path = models.TextField(null=True)
     runtime = models.IntegerField(null=True)
     movie_id = models.IntegerField(primary_key=True)
+    # vedio_url = models.CharField(max_length=100, blank=True)
 
     # ManyToManyField
     like_users = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name="like_movies")
