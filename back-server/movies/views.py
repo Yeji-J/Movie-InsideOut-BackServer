@@ -162,19 +162,13 @@ def like(request, movie_id):
     return JsonResponse(context)
 
 
-# 댓글을 모두 출력?
-@api_view(['GET'])
-def review_list(request):
-    if request.method == 'GET':
-        reviews = get_list_or_404(Review)
-        serializer = ReviewSerializer(reviews, many=True)
-        return Response(serializer.data)
-
 
 @api_view(['GET'])
 def review_list(request, movie_id):
     movie = get_object_or_404(Movie, pk=movie_id)
-    return Response(movie.reviews.all().values())
+    review = movie.reviews.all()
+    serializer = ReviewSerializer(review, many=True)
+    return Response(serializer.data)
 
 
 # 댓글 생성 -> 저장하기
