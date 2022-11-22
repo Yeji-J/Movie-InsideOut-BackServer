@@ -214,6 +214,8 @@ def review_detail(request, review_pk):
             return Response(serializer.data)
 
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def watchlist(request):
     movie = Movie.objects.filter(title=request.data.get('title'))
 
@@ -250,14 +252,9 @@ def watchlist(request):
         serializer = MovieDetailSerializer(data = request.data)
         
         if serializer.is_valid():
-            serializer.save(genres=request.data['genre_ids'], actors=actors)
+            movie = serializer.save(genres=request.data['genre_ids'], actors=actors)
 
+    movie.user_picks.add(request.user)
 
-    movie.like_users.add(request.user)
+    return Response(movie)
 
-    return Response(serializer.data)
-
-    
-    # # print('>>>>>>>>>>>>>>>>>>>>>', Movie.objects.distinct().values('title').count())
-
-    # return Response(data, status=status.HTTP_200_OK)

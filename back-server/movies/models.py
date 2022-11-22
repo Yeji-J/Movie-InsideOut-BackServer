@@ -34,6 +34,7 @@ class Movie(models.Model):
 
     # ManyToManyField
     user_picks = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name="watch_list")
+    watched_users = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name="watched_movies")
     like_users = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name="like_movies")
     genres = models.ManyToManyField(Genre, related_name="movies")
     actors = models.ManyToManyField(Actor, related_name="actors")
