@@ -21,6 +21,7 @@ def user_delete(request):
 
 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def profile(request, username):
     User = get_user_model()
     person = get_object_or_404(User, username=username)
