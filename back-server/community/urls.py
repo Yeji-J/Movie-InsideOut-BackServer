@@ -4,14 +4,12 @@ from . import views
 urlpatterns = [
     path('', views.post_list),
 
-    # path('create/', views.movie_create),
-    # path('<int:movie_id>/', views.movie_detail),
+    path('<int:post_pk>', views.post_detail)
 
-    # path('<int:movie_id>/like/', views.like),
+    path('comments/', views.comment_list),
 
-    # path('<int:movie_id>/reviews/', views.review_list),
+    path('comments/<int:comment_pk>/', views.comment_detail),
+    
+    path('<int:post_pk>/comments/', views.comment_create),
 
-    # path('<int:movie_id>/review_create/', views.review_create),
-
-    # path('reviews/<int:review_pk>/', views.review_detail),
 ]
