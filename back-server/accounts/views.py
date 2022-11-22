@@ -9,7 +9,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 
 # from movies.models import Movie
-from movies.serializers import ReviewSerializer
+from movies.serializers import ReviewSerializer, MovieTitleSerializer
 
 
 # Create your views here.
@@ -26,13 +26,13 @@ def profile(request, username):
     User = get_user_model()
     person = get_object_or_404(User, username=username)
     reviews = person.review_set.all()
-    favorites = person.like_movies.all().values('title', 'poster_path')
+    favorites = person.like_movies.all()
 
     context = {
         'user_id': person.id,
         'username': person.username,
         'reviews': ReviewSerializer(reviews, many=True).data,
-        'favorites': favorites,
+        'favorites': MovieTitleSerializer(favorites, many=True).data,
         'following_count': person.following.count(),
         'follower_count': person.follower.count()
     }
