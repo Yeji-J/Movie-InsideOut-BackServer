@@ -215,57 +215,47 @@ def review_detail(request, review_pk):
 
 
 def watchlist(request):
-    # try:
-    #     movie = get_list_or_404(pk=movie_id)
-    # except:
-    #     print('error')
-
     movie = Movie.objects.filter(title=request.data.get('title'))
-    if movie:
-        print('sucess')
-    
-    else:
-        print('fail')
+
+    if not movie:
+        movie_id = request.data['id']
+        api_key = '3cd8e0319cee80069c4b85f6cf42fded'
+
+        actor_url = f'https://api.themoviedb.org/3/movie/{movie_id}/credits'
+
+        params = {
+            'api_key': api_key,
+            # 'language': 'KO',
+        }
+
+        res = requests.get(actor_url, params).json()['cast']
+
+        actors = []
+        if len(res):
+            if len(res) < 5:
+                for idx in range(len(res)):
+                    actor = Actor(actor_id = res[idx]['id'], name = res[idx]['name'])
+                    actor.save()
+
+                    actors.append(res[idx]['id'])
+            
+            else:
+                for idx in range(5):
+                    actor = Actor(actor_id = res[idx]['id'], name = res[idx]['name'])
+                    actor.save()
+
+                    actors.append(res[idx]['id'])
         
-
-    # movie_id = request.data['id']
-
-    # api_key = '3cd8e0319cee80069c4b85f6cf42fded'
-
-    # actor_url = f'https://api.themoviedb.org/3/movie/{movie_id}/credits'
-
-    # params = {
-    #     'api_key': api_key,
-    #     # 'language': 'KO',
-    # }
-
-    # # 출연진 : cast, 연출진: crew
-    # res = requests.get(actor_url, params).json()['cast']
-
-    # actors = []
-    # if len(res):
-    #     if len(res) < 5:
-    #         for idx in range(len(res)):
-    #             actor = Actor(actor_id = res[idx]['id'], name = res[idx]['name'])
-    #             actor.save()
-
-    #             actors.append(res[idx]['id'])
+        request.data['movie_id'] = request.data['id']
+        serializer = MovieDetailSerializer(data = request.data)
         
-    #     else:
-    #         for idx in range(5):
-    #             actor = Actor(actor_id = res[idx]['id'], name = res[idx]['name'])
-    #             actor.save()
-
-    #             actors.append(res[idx]['id'])
-        
-        
-    # request.data['movie_id'] = request.data['id']
-    # serializer = MovieDetailSerializer(data = request.data)
-    
-    # if serializer.is_valid():
-    #     serializer.save(genres=request.data['genre_ids'], actors=actors)
+        if serializer.is_valid():
+            serializer.save(genres=request.data['genre_ids'], actors=actors)
 
 
+    movie.like_users.add(request.user)
+
+    return Response(serializer.data)
 
     
     # # print('>>>>>>>>>>>>>>>>>>>>>', Movie.objects.distinct().values('title').count())
