@@ -13,6 +13,13 @@ from .models import Movie, Genre, Actor, Review
 import requests
 
 
+def YouTube(movie_title):
+    API_KEY = 'AIzaSyBB6id-z5CSBNoyVx_BFv6Tz-VyFPd0k1o',
+    API_URL = 'https://www.googleapis.com/youtube/v3/search',
+    pass
+
+
+
 @api_view(['GET'])
 def movie_create(request):
 
@@ -205,3 +212,62 @@ def review_detail(request, review_pk):
         if serializer.is_valid(raise_exception=True):
             serializer.save()
             return Response(serializer.data)
+
+
+def watchlist(request):
+    # try:
+    #     movie = get_list_or_404(pk=movie_id)
+    # except:
+    #     print('error')
+
+    movie = Movie.objects.filter(title=request.data.get('title'))
+    if movie:
+        print('sucess')
+    
+    else:
+        print('fail')
+        
+
+    # movie_id = request.data['id']
+
+    # api_key = '3cd8e0319cee80069c4b85f6cf42fded'
+
+    # actor_url = f'https://api.themoviedb.org/3/movie/{movie_id}/credits'
+
+    # params = {
+    #     'api_key': api_key,
+    #     # 'language': 'KO',
+    # }
+
+    # # 출연진 : cast, 연출진: crew
+    # res = requests.get(actor_url, params).json()['cast']
+
+    # actors = []
+    # if len(res):
+    #     if len(res) < 5:
+    #         for idx in range(len(res)):
+    #             actor = Actor(actor_id = res[idx]['id'], name = res[idx]['name'])
+    #             actor.save()
+
+    #             actors.append(res[idx]['id'])
+        
+    #     else:
+    #         for idx in range(5):
+    #             actor = Actor(actor_id = res[idx]['id'], name = res[idx]['name'])
+    #             actor.save()
+
+    #             actors.append(res[idx]['id'])
+        
+        
+    # request.data['movie_id'] = request.data['id']
+    # serializer = MovieDetailSerializer(data = request.data)
+    
+    # if serializer.is_valid():
+    #     serializer.save(genres=request.data['genre_ids'], actors=actors)
+
+
+
+    
+    # # print('>>>>>>>>>>>>>>>>>>>>>', Movie.objects.distinct().values('title').count())
+
+    # return Response(data, status=status.HTTP_200_OK)

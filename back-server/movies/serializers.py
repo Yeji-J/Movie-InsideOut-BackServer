@@ -22,7 +22,7 @@ class MovieListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Movie
         fields = '__all__'
-        read_only_fields = ('like_users', 'actors')
+        read_only_fields = ('like_users', 'actors', 'user_picks')
 
 
 class MovieTitleSerializer(serializers.ModelSerializer):
@@ -52,7 +52,7 @@ class MovieDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Movie
         fields = '__all__'
-        read_only_fields = ('like_users',)
+        read_only_fields = ('like_users', 'user_picks')
 
 
 
