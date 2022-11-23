@@ -29,4 +29,6 @@ urlpatterns = [
     path('accounts/signup/', include('dj_rest_auth.registration.urls')),
     path('accounts/api-token-auth/', obtain_jwt_token),   # JWT token 발행.
     path('profile/', include('accounts.urls')),
+    path('community', include('community.urls')),    
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
