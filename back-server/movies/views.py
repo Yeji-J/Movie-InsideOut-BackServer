@@ -22,6 +22,7 @@ def YouTube(movie_title):
 
 @api_view(['GET'])
 def movie_create(request):
+    print('create')
 
     # 장르 API -> 데이터 불러오기
     api_key = '3cd8e0319cee80069c4b85f6cf42fded'
