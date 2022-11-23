@@ -218,10 +218,12 @@ def review_detail(request, review_pk):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def watchlist(request):
-    movie = Movie.objects.filter(title=request.data.get('title'))
+    
+    movie = Movie.objects.filter(title=request.data['movie'].get('title'))
 
     if not movie:
-        movie_id = request.data.get('id')
+        movie_id = request.data['movie']['id']
+
         api_key = '3cd8e0319cee80069c4b85f6cf42fded'
 
         actor_url = f'https://api.themoviedb.org/3/movie/{movie_id}/credits'
@@ -231,8 +233,9 @@ def watchlist(request):
             # 'language': 'KO',
         }
 
-        res = requests.get(actor_url, params).json()['cast']
-
+        
+        res = requests.get(actor_url, params).json()
+        
         actors = []
         if len(res) < 5:
             for idx in range(len(res)):
@@ -248,10 +251,10 @@ def watchlist(request):
 
                 actors.append(res[idx]['id'])
         
-        serializer = MovieDetailSerializer(data = request.data)
+        serializer = MovieDetailSerializer(data = request.data['movie'])
         
         if serializer.is_valid():
-            movie = serializer.save(genres=request.data['genre_ids'], actors=actors)
+            movie = serializer.save(genres=request.data['movie']['genre_ids'], actors=actors)
 
     movie.user_picks.add(request.user)
 
