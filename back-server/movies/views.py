@@ -215,7 +215,7 @@ def review_detail(request, review_pk):
             return Response(serializer.data)
 
 
-@api_view(['GET'])
+@api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def watchlist(request):
     movie = Movie.objects.filter(title=request.data.get('title'))
