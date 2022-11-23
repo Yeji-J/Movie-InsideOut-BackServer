@@ -76,7 +76,7 @@ def follow(request, user_pk):
 @permission_classes([IsAuthenticated])
 def watched_list(request, movie_id):
     User = get_user_model()
-    person = get_object_or_404(User, pk=user_pk)
+    person = get_object_or_404(User, pk=request.user.pk)
 
     person.watch_list.remove(movie_id)
     person.watched_movies.add(movie_id)
