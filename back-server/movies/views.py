@@ -221,7 +221,7 @@ def watchlist(request):
     movie = Movie.objects.filter(title=request.data.get('title'))
 
     if not movie:
-        movie_id = request.data['movie_id']
+        movie_id = request.data.get('id')
         api_key = '3cd8e0319cee80069c4b85f6cf42fded'
 
         actor_url = f'https://api.themoviedb.org/3/movie/{movie_id}/credits'
@@ -234,22 +234,20 @@ def watchlist(request):
         res = requests.get(actor_url, params).json()['cast']
 
         actors = []
-        if len(res):
-            if len(res) < 5:
-                for idx in range(len(res)):
-                    actor = Actor(actor_id = res[idx]['id'], name = res[idx]['name'])
-                    actor.save()
+        if len(res) < 5:
+            for idx in range(len(res)):
+                actor = Actor(actor_id = res[idx]['id'], name = res[idx]['name'])
+                actor.save()
 
-                    actors.append(res[idx]['id'])
-            
-            else:
-                for idx in range(5):
-                    actor = Actor(actor_id = res[idx]['id'], name = res[idx]['name'])
-                    actor.save()
-
-                    actors.append(res[idx]['id'])
+                actors.append(res[idx]['id'])
         
-        request.data['movie_id'] = request.data['movie_id']
+        else:
+            for idx in range(5):
+                actor = Actor(actor_id = res[idx]['id'], name = res[idx]['name'])
+                actor.save()
+
+                actors.append(res[idx]['id'])
+        
         serializer = MovieDetailSerializer(data = request.data)
         
         if serializer.is_valid():
