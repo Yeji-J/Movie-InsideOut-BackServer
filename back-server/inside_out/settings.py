@@ -36,10 +36,6 @@ INSTALLED_APPS = [
 
     'rest_framework',
 
-    #ckeditor
-    'ckeditor',
-    'ckeditor_uploader',
-
     # CORS
     'corsheaders',
 
@@ -203,9 +199,6 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-
-CKEDITOR_UPLOAD_PATH = 'uploads/'
-CKEDITOR_IMAGE_BACKEND = "pillow"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
