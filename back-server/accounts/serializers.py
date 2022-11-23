@@ -8,3 +8,11 @@ class ProfileSeriallizer(serializers.ModelSerializer):
     class Meta:
         model = get_user_model()
         fields = ('profile_image', )
+
+
+class UserNameSerializer(serializers.ModelSerializer):
+    # follower_count = serializers.IntegerField(source='follower.count', read_only=True)
+
+    class Meta:
+        model = get_user_model()
+        fields = ('username', 'follower',)

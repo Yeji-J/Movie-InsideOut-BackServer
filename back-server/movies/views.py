@@ -219,11 +219,7 @@ def review_detail(request, review_pk):
 @permission_classes([IsAuthenticated])
 def watchlist(request):
     
-<<<<<<< HEAD
-    movie = Movie.objects.filter(title=request.data['movie'].get('title'))
-=======
     movie = Movie.objects.filter(movie_id=request.data['movie'].get('movie_id'))
->>>>>>> feature/post
 
     if not movie:
         movie_id = request.data['movie']['id']

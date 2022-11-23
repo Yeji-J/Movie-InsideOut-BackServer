@@ -1,5 +1,6 @@
 from django.shortcuts import get_object_or_404, get_list_or_404
 from django.http import JsonResponse
+from django.contrib.auth import get_user_model
 
 from rest_framework import status
 from rest_framework.response import Response
@@ -9,14 +10,24 @@ from rest_framework.permissions import IsAuthenticated
 from .serializers import PostListSerializer, CommentSerializer, PostSerializer
 from .models import Post, Comment
 from movies.models import Movie
+from accounts.serializers import UserNameSerializer
 
 
 # Create your views here.
 @api_view(['GET'])
 def post_list(request):
-    posts = get_list_or_404(Post)
-    serializer = PostListSerializer(posts, many=True)
-    return Response(serializer.data)
+    User = get_user_model()
+    hot_follower = User.objects.all().order_by('-follower')[:5]
+    recent_post = Post.objects.all().order_by('-created_at')[:5]
+    hot_post = Post.objects.all().order_by('-like_users')[:5]
+    
+    context = {
+        'hot_follower': UserNameSerializer(hot_follower, many=True).data,
+        'recent_post': PostListSerializer(recent_post, many=True).data,
+        'hot_post': PostListSerializer(hot_post, many=True).data,
+    }
+
+    return Response(context)
 
 
 @api_view(['POST'])
