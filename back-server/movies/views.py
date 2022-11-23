@@ -249,7 +249,7 @@ def watchlist(request):
 
                     actors.append(res[idx]['id'])
         
-        request.data['movie_id'] = request.data['id']
+        request.data['movie_id'] = request.data['movie_id']
         serializer = MovieDetailSerializer(data = request.data)
         
         if serializer.is_valid():
