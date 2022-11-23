@@ -219,7 +219,11 @@ def review_detail(request, review_pk):
 @permission_classes([IsAuthenticated])
 def watchlist(request):
     
+<<<<<<< HEAD
     movie = Movie.objects.filter(title=request.data['movie'].get('title'))
+=======
+    movie = Movie.objects.filter(movie_id=request.data['movie'].get('movie_id'))
+>>>>>>> feature/post
 
     if not movie:
         movie_id = request.data['movie']['id']
@@ -232,9 +236,8 @@ def watchlist(request):
             'api_key': api_key,
             # 'language': 'KO',
         }
-
         
-        res = requests.get(actor_url, params).json()
+        res = requests.get(actor_url, params).json()['cast']
         
         actors = []
         if len(res) < 5:
@@ -250,13 +253,17 @@ def watchlist(request):
                 actor.save()
 
                 actors.append(res[idx]['id'])
-        
+
+
+        request.data['movie']['movie_id'] = request.data['movie']['id']
         serializer = MovieDetailSerializer(data = request.data['movie'])
+
+        if serializer.is_valid(raise_exception=True):
+            serializer.save(genres=request.data['movie']['genre_ids'], actors=actors)
         
-        if serializer.is_valid():
-            movie = serializer.save(genres=request.data['movie']['genre_ids'], actors=actors)
-    
+        movie = Movie.objects.get(pk=movie_id)
+
     movie.user_picks.add(request.user)
 
-    return Response(movie)
+    return Response(status=status.HTTP_201_CREATED)
 
