@@ -50,7 +50,7 @@ def profile(request, username):
         }
         return Response(context)
     
-    
+
     elif request.method == 'PUT':
         if person == request.user:
             serializer = ProfileSeriallizer(person, data=request.data)
@@ -83,15 +83,20 @@ def follow(request, user_pk):
         return JsonResponse(context)
     
 
-@api_view(['GET'])
+@api_view(['GET', 'DELETE'])
 @permission_classes([IsAuthenticated])
 def watched_list(request, movie_id):
     User = get_user_model()
     person = get_object_or_404(User, pk=request.user.pk)
 
     person.watch_list.remove(movie_id)
-    person.watched_movies.add(movie_id)
+    
+    if request.method == 'GET':
+        person.watched_movies.add(movie_id)
 
-    serializer = MovieTitleSerializer(person.watched_movies.all(), many=True)
+        serializer = MovieTitleSerializer(person.watched_movies.all(), many=True)
 
-    return Response(serializer.data)
+        return Response(serializer.data)
+    
+    elif request.method == 'DELETE':
+        return Response(status=status.HTTP_204_NO_CONTENT)
