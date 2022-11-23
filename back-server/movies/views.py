@@ -255,7 +255,7 @@ def watchlist(request):
         
         if serializer.is_valid():
             movie = serializer.save(genres=request.data['movie']['genre_ids'], actors=actors)
-
+    
     movie.user_picks.add(request.user)
 
     return Response(movie)
