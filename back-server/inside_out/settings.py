@@ -52,6 +52,8 @@ INSTALLED_APPS = [
 
     'drf_spectacular',
     
+    # 자동함수실행
+    'django_crontab',
     'django_extensions',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -212,6 +214,10 @@ import _locale
 _locale._getdefaultlocale = (lambda *args: ['en_US', 'utf-8'])
 
 
+CRONJOBS = [
+    # 분, 시, 일, 월, 요일
+    ('*****', 'movies.views.movie_create')
+]
 
 # TOKEN = d38ed6c5930db33554356628936c5c49b8caa471
 
