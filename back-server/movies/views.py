@@ -221,7 +221,7 @@ def watchlist(request):
     movie = Movie.objects.filter(title=request.data.get('title'))
 
     if not movie:
-        movie_id = request.data['id']
+        movie_id = request.data['movie_id']
         api_key = '3cd8e0319cee80069c4b85f6cf42fded'
 
         actor_url = f'https://api.themoviedb.org/3/movie/{movie_id}/credits'
