@@ -8,6 +8,8 @@ urlpatterns =[
 
     path('<int:post_pk>/', views.post_detail),
 
+    path('<int:post_pk>/like/', views.post_like),
+
     path('comments/', views.comment_list),
 
     path('comments/<int:comment_pk>/', views.comment_detail),
