@@ -218,10 +218,12 @@ def review_detail(request, review_pk):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def watchlist(request):
-    movie = Movie.objects.filter(title=request.data.get('title'))
+    
+    movie = Movie.objects.filter(movie_id=request.data['movie'].get('movie_id'))
 
     if not movie:
-        movie_id = request.data['id']
+        movie_id = request.data['movie']['id']
+
         api_key = '3cd8e0319cee80069c4b85f6cf42fded'
 
         actor_url = f'https://api.themoviedb.org/3/movie/{movie_id}/credits'
@@ -231,31 +233,34 @@ def watchlist(request):
             # 'language': 'KO',
         }
 
+        
         res = requests.get(actor_url, params).json()['cast']
-
+        
         actors = []
-        if len(res):
-            if len(res) < 5:
-                for idx in range(len(res)):
-                    actor = Actor(actor_id = res[idx]['id'], name = res[idx]['name'])
-                    actor.save()
+        if len(res) < 5:
+            for idx in range(len(res)):
+                actor = Actor(actor_id = res[idx]['id'], name = res[idx]['name'])
+                actor.save()
 
-                    actors.append(res[idx]['id'])
-            
-            else:
-                for idx in range(5):
-                    actor = Actor(actor_id = res[idx]['id'], name = res[idx]['name'])
-                    actor.save()
+                actors.append(res[idx]['id'])
+        
+        else:
+            for idx in range(5):
+                actor = Actor(actor_id = res[idx]['id'], name = res[idx]['name'])
+                actor.save()
 
-                    actors.append(res[idx]['id'])
+                actors.append(res[idx]['id'])
+
+
+        request.data['movie']['movie_id'] = request.data['movie']['id']
+        serializer = MovieDetailSerializer(data = request.data['movie'])
+
+        if serializer.is_valid(raise_exception=True):
+            serializer.save(genres=request.data['movie']['genre_ids'], actors=actors)
         
-        request.data['movie_id'] = request.data['id']
-        serializer = MovieDetailSerializer(data = request.data)
-        
-        if serializer.is_valid():
-            movie = serializer.save(genres=request.data['genre_ids'], actors=actors)
+        movie = Movie.objects.get(pk=movie_id)
 
     movie.user_picks.add(request.user)
 
-    return Response(movie)
+    return Response(status=status.HTTP_201_CREATED)
 

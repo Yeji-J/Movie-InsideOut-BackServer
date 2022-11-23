@@ -23,8 +23,8 @@ class Comment(models.Model):
     content = models.CharField(max_length=500)
 
     # ForeignKey
-    post = models.ForeignKey(Review, on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     
     # 대댓글
-    origin_comment = models.ForeignKey('self', on_delete=models.CASCADE, null=True)
+    # origin_comment = models.ForeignKey('self', on_delete=models.CASCADE, null=True)
