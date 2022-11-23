@@ -16,6 +16,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
+from django.conf import settings
+from django.conf.urls.static import static
+
+
 from rest_framework_jwt.views import obtain_jwt_token
 
 urlpatterns = [
@@ -25,4 +29,4 @@ urlpatterns = [
     path('accounts/signup/', include('dj_rest_auth.registration.urls')),
     path('accounts/api-token-auth/', obtain_jwt_token),   # JWT token 발행.
     path('profile/', include('accounts.urls')),
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
