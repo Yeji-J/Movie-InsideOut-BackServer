@@ -11,6 +11,7 @@ from rest_framework.permissions import IsAuthenticated
 # from movies.models import Movie
 from movies.serializers import ReviewSerializer, MovieTitleSerializer
 from .serializers import ProfileSeriallizer
+from community.serializers import PostListSerializer
 
 
 # Create your views here.
@@ -29,6 +30,7 @@ def profile(request, username):
     if request.method == 'GET':
         reviews = person.review_set.all()
         favorites = person.like_movies.all()
+        posts = person.like_reviews.all()
         watchlist = person.watch_list.all()
         watched = person.watched_movies.all()
 
@@ -47,6 +49,7 @@ def profile(request, username):
             'follower_count': person.follower.count(),
             'watch_list': MovieTitleSerializer(watchlist, many=True).data,
             'watched_movies': MovieTitleSerializer(watched, many=True).data,
+            'posts': PostListSerializer(posts, many=True).data,
         }
         return Response(context)
     

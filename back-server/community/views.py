@@ -53,6 +53,28 @@ def post_detail(request, post_pk):
 
 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def post_like(request, post_id):
+    post = get_object_or_404(Post, pk=post_id)
+    
+    if post.like_users.filter(pk=request.user.pk).exists():
+        post.like_users.remove(request.user)
+        is_liked = False
+    
+    else:
+        post.like_users.add(request.user)
+        is_liked = True
+        
+    context = {
+        'is_liked': is_liked,
+        'like_count' : post.like_users.count()
+    }
+
+    return JsonResponse(context)
+
+
+
+@api_view(['GET'])
 def comment_list(request):
     if request.method == 'GET':
         comments = get_list_or_404(Comment)
