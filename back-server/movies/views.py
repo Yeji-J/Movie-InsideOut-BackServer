@@ -263,3 +263,30 @@ def watchlist(request):
 
     return Response(status=status.HTTP_201_CREATED)
 
+
+@api_view(['GET'])
+def movie_recommend(request):
+    movie = Movie.objects.filter(genres__in=[36, 37])
+
+    recommend_dict = {
+        'joy': [35, 10749],        # 기쁨  (Comedy, Romance)
+        'sadness': [18, 10751],    # 슬픔  (Drama, Family)
+        'anger': [12, 28],         # 화남  (Aventure, Action)
+        'fear': [27, 53],          # 공포  (Horror, Thriller)
+        'disgust': [878, 9648],    # 싫음 (Science Fiction, Mystery)
+    }
+
+    feeling = request.GET.get('sorted')
+    genre_set = recommend_dict.get(feeling, False)
+
+    if genre_set:
+        movies = Movie.objects.filter(genres__in=genre_set).order_by('?')[:10]
+
+
+    else:
+        movies = Movie.objects.filter(adult=True)
+
+
+    serializer = MovieListSerializer(movies, many=True)
+
+    return Response(serializer.data)
