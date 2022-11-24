@@ -135,7 +135,7 @@ def movie_detail(request, movie_id):
     
     is_liked = False
 
-    if request.user.pk:
+    if request.user:       # 혹시 key값을 가지고 오지 않는다면???
         if movie.like_users.filter(pk=request.user.pk).exists():
             is_liked = True
         else:
@@ -219,7 +219,7 @@ def review_detail(request, review_pk):
 @permission_classes([IsAuthenticated])
 def watchlist(request):
     
-    movie = Movie.objects.filter(movie_id=request.data['movie'].get('movie_id'))
+    movie = Movie.objects.filter(movie_id=request.data['movie'].get('id'))
 
     if not movie:
         movie_id = request.data['movie']['id']
@@ -258,6 +258,9 @@ def watchlist(request):
             serializer.save(genres=request.data['movie']['genre_ids'], actors=actors)
         
         movie = Movie.objects.get(pk=movie_id)
+
+    else:
+        movie = get_object_or_404(Movie, pk=request.data['movie'].get('id'))
 
     movie.user_picks.add(request.user)
 
