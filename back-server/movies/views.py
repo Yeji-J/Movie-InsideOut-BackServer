@@ -215,52 +215,58 @@ def review_detail(request, review_pk):
             return Response(serializer.data)
 
 
+# 검색했을 때, 영화가 db에 없으면, 넣어주는 함수
+def db_create(movie_data):
+    movie_id = movie_data['id']
+
+    api_key = '3cd8e0319cee80069c4b85f6cf42fded'
+
+    actor_url = f'https://api.themoviedb.org/3/movie/{movie_id}/credits'
+
+    params = {
+        'api_key': api_key,
+        # 'language': 'KO',
+    }
+    
+    res = requests.get(actor_url, params).json()['cast']
+    
+    actors = []
+    if len(res) < 5:
+        for idx in range(len(res)):
+            actor = Actor(actor_id = res[idx]['id'], name = res[idx]['name'])
+            actor.save()
+
+            actors.append(res[idx]['id'])
+    
+    else:
+        for idx in range(5):
+            actor = Actor(actor_id = res[idx]['id'], name = res[idx]['name'])
+            actor.save()
+
+            actors.append(res[idx]['id'])
+
+
+    movie_data['movie_id'] = movie_data['id']
+    serializer = MovieDetailSerializer(data = movie_data)
+
+    if serializer.is_valid(raise_exception=True):
+        serializer.save(genres=movie_data['genre_ids'], actors=actors)
+    
+    return movie_id
+    
+
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def watchlist(request):
-    
     movie = Movie.objects.filter(movie_id=request.data['movie'].get('id'))
 
+    movie_id = request.data['movie']['id']
+
     if not movie:
-        movie_id = request.data['movie']['id']
+        db_create(request.data['movie'])
 
-        api_key = '3cd8e0319cee80069c4b85f6cf42fded'
-
-        actor_url = f'https://api.themoviedb.org/3/movie/{movie_id}/credits'
-
-        params = {
-            'api_key': api_key,
-            # 'language': 'KO',
-        }
-        
-        res = requests.get(actor_url, params).json()['cast']
-        
-        actors = []
-        if len(res) < 5:
-            for idx in range(len(res)):
-                actor = Actor(actor_id = res[idx]['id'], name = res[idx]['name'])
-                actor.save()
-
-                actors.append(res[idx]['id'])
-        
-        else:
-            for idx in range(5):
-                actor = Actor(actor_id = res[idx]['id'], name = res[idx]['name'])
-                actor.save()
-
-                actors.append(res[idx]['id'])
-
-
-        request.data['movie']['movie_id'] = request.data['movie']['id']
-        serializer = MovieDetailSerializer(data = request.data['movie'])
-
-        if serializer.is_valid(raise_exception=True):
-            serializer.save(genres=request.data['movie']['genre_ids'], actors=actors)
-        
-        movie = Movie.objects.get(pk=movie_id)
-
-    else:
-        movie = get_object_or_404(Movie, pk=request.data['movie'].get('id'))
+    movie = get_object_or_404(Movie, pk=movie_id)
 
     movie.user_picks.add(request.user)
 
@@ -269,14 +275,14 @@ def watchlist(request):
 
 @api_view(['GET'])
 def movie_recommend(request):
-    movie = Movie.objects.filter(genres__in=[36, 37])
+    # movie = Movie.objects.filter(genres__in=[36, 37])
 
     recommend_dict = {
-        'joy': [35, 10749],        # 기쁨  (Comedy, Romance)
-        'sadness': [18, 10751],    # 슬픔  (Drama, Family)
-        'anger': [12, 28],         # 화남  (Aventure, Action)
-        'fear': [27, 53],          # 공포  (Horror, Thriller)
-        'disgust': [878, 9648],    # 싫음 (Science Fiction, Mystery)
+        'Joy': [35, 10749],               # 기쁨  (Comedy, Romance)
+        'Sadness': [18, 10751, 10749],    # 슬픔  (Drama, Family, Romance)
+        'Anger': [12, 28],                # 화남  (Aventure, Action)
+        'Fear': [27, 53, 28],          # 공포  (Horror, Thriller, Action)
+        'Disgust': [878, 9648],        # 싫음 (Science Fiction, Mystery)
     }
 
     feeling = request.GET.get('sorted')

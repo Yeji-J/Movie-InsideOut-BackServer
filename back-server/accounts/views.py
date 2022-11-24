@@ -65,9 +65,10 @@ def profile(request, username):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def follow(request, user_pk):
+def follow(request, username):
     User = get_user_model()
-    person = get_object_or_404(User, pk=user_pk)
+    person = get_object_or_404(User, username=username)
+
     if person != request.user:
         if person.follower.filter(pk=request.user.pk).exists():
             person.follower.remove(request.user)
@@ -86,7 +87,7 @@ def follow(request, user_pk):
         return JsonResponse(context)
     
 
-@api_view(['GET', 'DELETE'])
+@api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def watched_list(request, movie_id):
     User = get_user_model()
@@ -94,12 +95,12 @@ def watched_list(request, movie_id):
 
     person.watch_list.remove(movie_id)
     
-    if request.method == 'GET':
-        person.watched_movies.add(movie_id)
+    # if request.method == 'GET':
+    #     person.watched_movies.add(movie_id)
 
-        serializer = MovieTitleSerializer(person.watched_movies.all(), many=True)
+    #     serializer = MovieTitleSerializer(person.watched_movies.all(), many=True)
 
-        return Response(serializer.data)
+    #     return Response(serializer.data)
     
-    elif request.method == 'DELETE':
-        return Response(status=status.HTTP_204_NO_CONTENT)
+    # elif request.method == 'DELETE':
+    return Response(status=status.HTTP_204_NO_CONTENT)

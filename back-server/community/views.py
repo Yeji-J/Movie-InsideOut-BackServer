@@ -10,6 +10,7 @@ from rest_framework.permissions import IsAuthenticated
 from .serializers import PostListSerializer, CommentSerializer, PostSerializer
 from .models import Post, Comment
 from movies.models import Movie
+from movies.views import db_create
 from accounts.serializers import UserNameSerializer
 
 
@@ -19,7 +20,7 @@ def post_list(request):
     User = get_user_model()
     hot_follower = User.objects.all().order_by('-follower')[:5]
     recent_post = Post.objects.all().order_by('-created_at')[:5]
-    hot_post = Post.objects.all().order_by('-like_users')[:5]
+    hot_post = Post.objects.all().distinct().order_by('-like_users')[:5]
     
     context = {
         'hot_follower': UserNameSerializer(hot_follower, many=True).data,
@@ -33,22 +34,41 @@ def post_list(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def post_create(request, movie_id):
+    movie = Movie.objects.filter(movie_id=movie_id)
+
+    if not movie:
+        db_create(request.data['movie'])
+    
     movie = get_object_or_404(Movie, pk=movie_id)
 
     serializer = PostListSerializer(data=request.data)
     if serializer.is_valid(raise_exception=True):
         serializer.save(user=request.user, movie=movie)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+    
 
 
 
 @api_view(['GET', 'DELETE', 'PUT'])
+@permission_classes([IsAuthenticated])
 def post_detail(request, post_pk):
     post = get_object_or_404(Post, pk=post_pk)
 
     if request.method == 'GET':
         serializer = PostSerializer(post)
-        return Response(serializer.data)
+
+        if post.like_users.filter(pk=request.user.pk).exists():
+            is_liked = True
+    
+        else:
+            is_liked = False
+
+        context = {
+            'data': serializer.data,
+            'is_liked': is_liked,
+        }
+
+        return Response(context)
     
     elif request.method == 'DELETE':
         if request.user == post.user:
@@ -65,8 +85,8 @@ def post_detail(request, post_pk):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def post_like(request, post_id):
-    post = get_object_or_404(Post, pk=post_id)
+def post_like(request, post_pk):
+    post = get_object_or_404(Post, pk=post_pk)
     
     if post.like_users.filter(pk=request.user.pk).exists():
         post.like_users.remove(request.user)
