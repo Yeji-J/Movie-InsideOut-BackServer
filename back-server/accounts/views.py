@@ -10,6 +10,8 @@ from rest_framework.permissions import IsAuthenticated
 
 # from movies.models import Movie
 from movies.serializers import ReviewSerializer, MovieTitleSerializer
+from .serializers import ProfileSeriallizer
+from community.serializers import PostListSerializer
 
 
 # Create your views here.
@@ -20,33 +22,45 @@ def user_delete(request):
     return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-@api_view(['GET'])
+@api_view(['GET', 'PUT'])
 @permission_classes([IsAuthenticated])
 def profile(request, username):
     User = get_user_model()
     person = get_object_or_404(User, username=username)
-    reviews = person.review_set.all()
-    favorites = person.like_movies.all()
-    watchlist = person.watch_list.all()
-    watched = person.watched_movies.all()
+    if request.method == 'GET':
+        reviews = person.review_set.all()
+        favorites = person.like_movies.all()
+        posts = person.like_reviews.all()
+        watchlist = person.watch_list.all()
+        watched = person.watched_movies.all()
 
-    if person.follower.filter(pk=request.user.pk).exists():
-        is_followed = True
-    else:
-        is_followed = False
+        if person.follower.filter(pk=request.user.pk).exists():
+            is_followed = True
+        else:
+            is_followed = False
 
-    context = {
-        'user_id': person.id,
-        'username': person.username,
-        'reviews': ReviewSerializer(reviews, many=True).data,
-        'favorites': MovieTitleSerializer(favorites, many=True).data,
-        'is_followed': is_followed,
-        'following_count': person.following.count(),
-        'follower_count': person.follower.count(),
-        'watch_list': MovieTitleSerializer(watchlist, many=True).data,
-        'watched_movies': MovieTitleSerializer(watched, many=True).data,
-    }
-    return Response(context)
+        context = {
+            'user_id': person.id,
+            'username': person.username,
+            'reviews': ReviewSerializer(reviews, many=True).data,
+            'favorites': MovieTitleSerializer(favorites, many=True).data,
+            'is_followed': is_followed,
+            'following_count': person.following.count(),
+            'follower_count': person.follower.count(),
+            'watch_list': MovieTitleSerializer(watchlist, many=True).data,
+            'watched_movies': MovieTitleSerializer(watched, many=True).data,
+            'posts': PostListSerializer(posts, many=True).data,
+        }
+        return Response(context)
+    
+
+    elif request.method == 'PUT':
+        if person == request.user:
+            serializer = ProfileSeriallizer(person, data=request.data)
+            if serializer.is_valid(raise_exception=True):
+                serializer.save()
+                return Response(serializer.data)
+        return Response(status=status.HTTP_403_FORBIDDEN)
 
 
 @api_view(['GET'])
@@ -72,15 +86,20 @@ def follow(request, user_pk):
         return JsonResponse(context)
     
 
-@api_view(['GET'])
+@api_view(['GET', 'DELETE'])
 @permission_classes([IsAuthenticated])
 def watched_list(request, movie_id):
     User = get_user_model()
     person = get_object_or_404(User, pk=request.user.pk)
 
     person.watch_list.remove(movie_id)
-    person.watched_movies.add(movie_id)
+    
+    if request.method == 'GET':
+        person.watched_movies.add(movie_id)
 
-    serializer = MovieTitleSerializer(person.watched_movies.all(), many=True)
+        serializer = MovieTitleSerializer(person.watched_movies.all(), many=True)
 
-    return Response(serializer.data)
+        return Response(serializer.data)
+    
+    elif request.method == 'DELETE':
+        return Response(status=status.HTTP_204_NO_CONTENT)
